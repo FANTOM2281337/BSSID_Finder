@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+__author__      = "Ferran Verdes - ferranverdes@gmail.com"
+
 import sys
 from scapy.all import *
 
